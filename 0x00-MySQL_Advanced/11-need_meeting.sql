@@ -1,17 +1,6 @@
--- creates a stored procedure ComputeAverageWeightedScoreForUser that computes and store the average weighted score for a student
-DROP PROCEDURE IF EXISTS ComputeAverageWeightedScoreForUser;
-DELIMITER $$
-CREATE PROCEDURE ComputeAverageWeightedScoreForUser(
-    user_id INT
-)
-BEGIN
-    DECLARE w_avg_score FLOAT;
-    SET w_avg_score = (SELECT SUM(score * weight) / SUM(weight) 
-                        FROM users AS U 
-                        JOIN corrections as C ON U.id=C.user_id 
-                        JOIN projects AS P ON C.project_id=P.id 
-                        WHERE U.id=user_id);
-    UPDATE users SET average_score = w_avg_score WHERE id=user_id;
-END
-$$
-DELIMITER ;
+-- a SQL script that creates a view need_meeting that lists all students that have a score under 80 (strict) and no last_meeting or more than 1 month.
+
+DROP VIEW IF EXISTS need_meeting;
+CREATE VIEW need_meeting AS 
+SELECT name FROM students WHERE score < 80
+AND (students.last_meeting IS NULL OR students.last_meeting < DATE_ADD(NOW(), INTERVAL -1 MONTH));
